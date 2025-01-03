@@ -1,3 +1,7 @@
+#include <SPI.h>
+#include <nRF24L01.h>
+#include <RF24.h>
+
 
 //Left motor is input 1 and 2, right motor is input 3 and 4
 //defining motor pins
@@ -7,37 +11,36 @@
 #define INPUT_LM_2 3
 #define INPUT_RM_3 8
 #define INPUT_RM_4 7
-#define BUTTON 4
+
 
 //change voltage with input pins to control direction
 //change analog write values to enable pins to control speed
 
-bool on = false;
+RF24 radio(A0, A1);
+const byte address[6] = "00001";
+
+bool on = 1;
+bool off = 0;
 
 void setup() {
   for(int i = 2; i < 8; i++){
-    pinMode(i, OUTPUT);
+    if(i != 4){
+      pinMode(i, OUTPUT);
+    }
   }
   analogWrite(ENABLE_LM, 150);
   analogWrite(ENABLE_RM, 150);
-  delay(1000);
+  radio.begin();
+  radio.openWritingPipe(address);
+  radio.setPALevel(RF24_PA_MIN);
+  radio.stopListening();
 }
 
 void loop() {
-  if(on){
-  goForward();
+  radio.write(&on, sizeof(on));
   delay(1000);
-  stop();
-  goBackward();
+  radio.write(&off, sizeof(off));
   delay(1000);
-  stop();
-  } else {
-    stop();
-  }
-  int buttonState = digitalRead(BUTTON);
-  if(buttonState == HIGH){
-    on = !on;
-  } 
 }
 
 void goForward(){
