@@ -19,9 +19,6 @@
 RF24 radio(A0, A1);
 const byte address[6] = "00001";
 
-bool on = 1;
-bool off = 0;
-
 void setup() {
   for(int i = 2; i < 8; i++){
     if(i != 4){
@@ -31,16 +28,13 @@ void setup() {
   analogWrite(ENABLE_LM, 150);
   analogWrite(ENABLE_RM, 150);
   radio.begin();
-  radio.openWritingPipe(address);
+  radio.openReadingPipe(0, address);
   radio.setPALevel(RF24_PA_MIN);
-  radio.stopListening();
+  radio.startListening();
 }
 
 void loop() {
-  radio.write(&on, sizeof(on));
-  delay(1000);
-  radio.write(&off, sizeof(off));
-  delay(1000);
+  
 }
 
 void goForward(){
