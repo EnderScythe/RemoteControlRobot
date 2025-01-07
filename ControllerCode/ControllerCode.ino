@@ -20,6 +20,7 @@ void setup() {
   mpu->calibrateMPU(2000);
 
   radio.begin();
+  radio.setChannel(0);
   radio.openWritingPipe(address);
   radio.setPALevel(RF24_PA_MIN);
   radio.stopListening();
@@ -29,11 +30,13 @@ void setup() {
 void loop() {
   // previousTime = currentTime;
   // currentTime = micros();
-  // Serial.println(currentTime - previousTime);
+  //Serial.println(currentTime - previousTime);
   mpu->prepareMeasurements();
   float roll = mpu->getRoll();
   float pitch = mpu->getPitch();
-  String data = String(roll) + " " + String(pitch);
+  String msg = String(roll) + " " + String(pitch);
+  char data[msg.length() + 1];
+  msg.toCharArray(data, msg.length() + 1);
   radio.write(&data, sizeof(data));
   Serial.print(roll); Serial.print(", ");
   Serial.println(pitch);
